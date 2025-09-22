@@ -44,4 +44,22 @@ class LombaController extends Controller
             'penyelenggara' => $penyelenggara
         ]);
     }
+    public function edit(Lomba $lomba)
+{
+    return view('lomba.edit', ['lomba' => $lomba]);
+}
+
+public function update(Request $request, Lomba $lomba)
+{
+    $validated = $request->validate([
+        'judul' => 'required|string|max:255',
+        'penyelenggara' => 'required|string|max:255',
+        'deskripsi' => 'required|string',
+        'harga' => 'required|numeric',
+    ]);
+
+    $lomba->update($validated);
+
+    return redirect()->route('lomba.index')->with('success', 'Data lomba berhasil diperbarui!');
+}
 }
