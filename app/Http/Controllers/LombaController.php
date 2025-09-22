@@ -36,9 +36,8 @@ class LombaController extends Controller
         // SOAL 4: Statistik
         $stats = [
             'total_lomba' => Lomba::count(),
-            'total_harga' => Lomba::sum('harga'),
-            'harga_tertinggi' => Lomba::max('harga'),
-            'harga_terendah' => Lomba::min('harga'),
+            'total_available' => Lomba::where('status', 'available')->count(),
+            'total_unavailable' => Lomba::where('status', 'unavailable')->count()
         ];
         
         $penyelenggara = Lomba::select('penyelenggara')->distinct()->orderBy('penyelenggara')->pluck('penyelenggara');
