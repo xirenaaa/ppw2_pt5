@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lombas', function (Blueprint $table) {
-            $table->integer('id_lomba');
+            $table->id();
             $table->string('nama_lomba');
             $table->text('deskripsi');
             $table->date('tgl_lomba');
@@ -18,10 +18,9 @@ return new class extends Migration
             $table->string('gambar');
             $table->string('penyelenggara_lomba');
             $table->enum('status', ['available', 'unavailable'])->default('available');
-            $table->integer('id_bidang')->nullable();
+            $table->unsignedBigInteger('id_bidang')->nullable();
             $table->enum('kategori_peserta', ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum'])->default('Umum');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamps();
         });
     }
 
