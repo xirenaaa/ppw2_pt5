@@ -56,7 +56,6 @@ class LombaController extends Controller
             'nama_lomba' => 'required|string|max:255',
             'penyelenggara_lomba' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            // 'harga' => 'required|numeric', // Sesuaikan jika ada kolom harga di form
         ]);
 
         $lomba->update($validated);

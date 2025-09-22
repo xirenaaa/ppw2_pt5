@@ -49,53 +49,59 @@
         </div>
 
         @if($lombas->isEmpty())
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg text-center">Lomba tidak
-                ditemukan.</div>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg text-center">
+                Lomba tidak ditemukan.
+            </div>
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($lombas as $lomba)
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <img src="{{ asset($lomba->gambar) }}" alt="{{ $lomba->nama_lomba }}" 
+                        <img src="{{ asset($lomba->gambar) }}" 
+                             alt="{{ $lomba->nama_lomba }}" 
                              class="w-full h-48 object-cover">
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-2">
-                                <h2 class="text-xl font-bold text-gray-900 flex-1">{{ $lomba->nama_lomba }}</h2>
-                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                                <h2 class="text-xl font-bold text-gray-900 flex-1 line-clamp-2">
+                                    {{ $lomba->nama_lomba }}
+                                </h2>
+                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ml-2
                                     {{ $lomba->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $lomba->status }}
                                 </span>
                             </div>
                             
                             <p class="text-sm text-gray-600 mb-2">{{ $lomba->penyelenggara_lomba }}</p>
-                            <p class="text-sm text-gray-500 mb-1">
-                                <span class="font-semibold">Bidang:</span> 
-                                {{ $lomba->bidang->nama_bidang ?? 'Tidak ada' }}
-                            </p>
-                            <p class="text-sm text-gray-500 mb-3">
-                                <span class="font-semibold">Kategori:</span> 
-                                {{ $lomba->kategori_peserta }}
-                            </p>
+                            
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                                    {{ $lomba->bidang->nama_bidang ?? 'Tidak ada bidang' }}
+                                </span>
+                                <span class="bg-sky-100 text-sky-800 text-xs px-2 py-1 rounded">
+                                    {{ $lomba->kategori_peserta }}
+                                </span>
+                            </div>
                             
                             <div class="flex gap-2 mb-4">
                                 <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                                     {{ $lomba->lokasi }}
                                 </span>
                                 <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
-                                    {{ \Carbon\Carbon::parse($lomba->tgl_lomba)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($lomba->tgl_lomba)->isoFormat('D MMM Y') }}
                                 </span>
                             </div>
                             
-                            <p class="text-gray-700 mb-4 h-20 overflow-hidden">
-                                {{ Str::limit($lomba->deskripsi, 100) }}
+                            <p class="text-gray-700 mb-4 line-clamp-3">
+                                {{ $lomba->deskripsi }}
                             </p>
                             
-                            <div class="flex justify-between items-center mt-4">
-                                <a href="{{ route('lomba.show', $lomba) }}" 
+                            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                                <a href="{{ route('lomba.show', $lomba->id_lomba) }}" 
                                    class="text-sky-600 hover:text-sky-800 text-sm font-semibold">
                                     Lihat Detail →
                                 </a>
-                                <a href="{{ $lomba->link_daftar }}" target="_blank"
-                                   class="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-sky-700">
+                                <a href="{{ $lomba->link_daftar }}" 
+                                   target="_blank"
+                                   class="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-sky-700 transition">
                                     Daftar
                                 </a>
                             </div>
@@ -103,7 +109,10 @@
                     </div>
                 @endforeach
             </div>
-            <div class="mt-8">{{ $lombas->appends(request()->query())->links() }}</div>
+            
+            <div class="mt-8">
+                {{ $lombas->appends(request()->query())->links() }}
+            </div>
         @endif
 
         <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -117,11 +126,11 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Available</p>
-                            <p class="text-2xl font-bold text-green-600">{{ $stats['total_available'] }}</p>
+                            <p class="text-2xl font-bold text-green-600">{{ $stats['total_available'] ?? '0' }}</p>
                         </div>
                         <div>
                             <p class="text-gray-500">Unavailable</p>
-                            <p class="text-2xl font-bold text-red-600">{{ $stats['total_unavailable'] }}</p>
+                            <p class="text-2xl font-bold text-red-600">{{ $stats['total_unavailable'] ?? '0' }}</p>
                         </div>
                     </div>
                 </div>

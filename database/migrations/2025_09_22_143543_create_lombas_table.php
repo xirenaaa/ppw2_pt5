@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('penyelenggara_lomba');
             $table->enum('status', ['available', 'unavailable'])->default('available');
             $table->unsignedBigInteger('id_bidang')->nullable();
-            $table->string('kategori_peserta')->default('Umum');
+            $table->enum('kategori_peserta', ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum'])->default('Umum');
             $table->timestamps();
         });
     }
