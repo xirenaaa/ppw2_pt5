@@ -19,7 +19,7 @@ class LombaController extends Controller
 
         // SOAL 3: filtering by kategori
         if ($request->filled('penyelenggara')) {
-            $query->where('penyelenggara', $request->penyelenggara);
+            $query->where('penyelenggara_lomba', $request->penyelenggara);
         }
         
         // SOAL 5: search jdul
@@ -40,7 +40,10 @@ class LombaController extends Controller
             'total_unavailable' => Lomba::where('status', 'unavailable')->count()
         ];
         
-        $penyelenggara = Lomba::select('penyelenggara')->distinct()->orderBy('penyelenggara')->pluck('penyelenggara');
+        $penyelenggara = Lomba::select('penyelenggara_lomba')
+            ->distinct()
+            ->orderBy('penyelenggara_lomba')
+            ->pluck('penyelenggara_lomba');
 
         return view('lomba.index', [
             'lombas' => $lombas,
@@ -58,7 +61,7 @@ public function update(Request $request, Lomba $lomba)
 {
     $validated = $request->validate([
         'judul' => 'required|string|max:255',
-        'penyelenggara' => 'required|string|max:255',
+        'penyelenggara_lomba' => 'required|string|max:255',
         'deskripsi' => 'required|string',
         'harga' => 'required|numeric',
     ]);

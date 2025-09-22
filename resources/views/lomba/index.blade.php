@@ -87,25 +87,18 @@
             <div class="lg:col-span-2">
                 <div class="bg-white p-6 rounded-xl shadow-lg">
                     <h3 class="text-2xl font-bold mb-4 text-sky-800">Statistik Lomba</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                         <div>
                             <p class="text-gray-500">Total Lomba</p>
                             <p class="text-2xl font-bold">{{ $stats['total_lomba'] }}</p>
                         </div>
                         <div>
-                            <p class="text-gray-500">Total Biaya</p>
-                            <p class="text-2xl font-bold">Rp
-                                {{ number_format($stats['total_harga'] / 1000000, 1, ',', '.') }} Jt</p>
+                            <p class="text-gray-500">Lomba Available</p>
+                            <p class="text-2xl font-bold">{{ $stats['total_available'] }}</p>
                         </div>
                         <div>
-                            <p class="text-gray-500">Tertinggi</p>
-                            <p class="text-2xl font-bold">Rp
-                                {{ number_format($stats['harga_tertinggi'] / 1000, 0, ',', '.') }} K</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Terendah</p>
-                            <p class="text-2xl font-bold">Rp
-                                {{ number_format($stats['harga_terendah'] / 1000, 0, ',', '.') }} K</p>
+                            <p class="text-gray-500">Lomba Unavailable</p>
+                            <p class="text-2xl font-bold">{{ $stats['total_unavailable'] }}</p>
                         </div>
                     </div>
                 </div>
