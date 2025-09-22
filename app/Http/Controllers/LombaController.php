@@ -25,13 +25,17 @@ class LombaController extends Controller
             $query->where('nama_lomba', 'like', '%' . $request->search . '%');
         }
 
-        $lombas = $query->with('bidang')->latest()->paginate(6);
+        $lombas = $query->with(['bidang' => function($query) {
+            $query->select('id_bidang', 'nama_bidang');
+        }])->latest()->paginate(6);
         $lombaTerbaru = Lomba::latest()->take(5)->get();
+        
         $stats = [
             'total_lomba' => Lomba::count(),
-            'lomba_available' => Lomba::where('status', 'available')->count(),
-            'lomba_unavailable' => Lomba::where('status', 'unavailable')->count(),
+            'total_available' => Lomba::where('status', 'available')->count(),
+            'total_unavailable' => Lomba::where('status', 'unavailable')->count(),
         ];
+
         $penyelenggara = Lomba::select('penyelenggara_lomba')->distinct()->orderBy('penyelenggara_lomba')->pluck('penyelenggara_lomba');
         $bidang_lombas = BidangLomba::orderBy('nama_bidang')->get();
         $kategori_peserta = ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum'];

@@ -4,97 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Info Lomba</title>
+    <title>{{ $lomba->nama_lomba }}</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-sky-100 text-gray-800">
     <div class="container mx-auto p-4 md:p-8">
-        <h1 class="text-4xl font-bold text-center text-sky-800 mb-6">Info Lomba</h1>
+        <div class="max-w-4xl mx-auto">
+            <a href="{{ route('lomba.index') }}" class="text-sky-600 hover:text-sky-800 mb-4 inline-block">&larr;
+                Kembali ke Daftar Lomba</a>
 
-        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
-            <form action="{{ route('lomba.index') }}" method="GET">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div class="md:col-span-4"><input type="text" name="search"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Cari judul lomba..."
-                            value="{{ request('search') }}"></div>
-                    <div class="md:col-span-3"><select name="penyelenggara"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">Semua Penyelenggara</option>@foreach($penyelenggara as $p)<option
-                                value="{{ $p }}" {{ request('penyelenggara') == $p ? 'selected' : '' }}>{{ $p }}</option>
-                            @endforeach
-                        </select></div>
-                    <div class="md:col-span-2"><select name="bidang"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">Semua Bidang</option>@foreach($bidang_lombas as $bidang)<option
-                                value="{{ $bidang->id }}" {{ request('bidang') == $bidang->id ? 'selected' : '' }}>
-                            {{ $bidang->nama_bidang }}</option>@endforeach
-                        </select></div>
-                    <div class="md:col-span-2"><select name="kategori"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">Semua Kategori</option>@foreach($kategori_peserta as $kategori)<option
-                                value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
-                            {{ $kategori }}</option>@endforeach
-                        </select></div>
-                    <div class="md:col-span-1"><button type="submit"
-                            class="w-full bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700">Cari</button>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <img src="{{ asset($lomba->gambar) }}" alt="{{ $lomba->nama_lomba }}" class="w-full h-64 object-cover">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-2">
+                        <h1 class="text-3xl font-bold text-gray-900 flex-1">{{ $lomba->nama_lomba }}</h1>
+                        <span
+                            class="inline-block px-3 py-1 text-sm font-semibold rounded-full ml-4
+                            {{ $lomba->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            {{ ucfirst($lomba->status) }}
+                        </span>
                     </div>
-                </div>
-            </form>
-        </div>
 
-        @if($lombas->isEmpty())
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg text-center">Lomba tidak
-                ditemukan.</div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($lombas as $lomba)
-                    <a href="{{ route('lomba.show', $lomba) }}"
-                        class="block bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
-                        <div class="p-6">
-                            <h2 class="text-xl font-bold text-gray-900 truncate">{{ $lomba->nama_lomba }}</h2>
-                            <p class="text-sm text-gray-600 mt-1">{{ $lomba->penyelenggara_lomba }}</p>
-                            <p class="text-gray-700 mt-4 h-20 overflow-hidden">{{ Str::limit($lomba->deskripsi, 120) }}</p>
-                        </div>
-                        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-right">
-                            <span class="text-sm font-semibold text-sky-600">Lihat Detail &rarr;</span>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-            <div class="mt-8">{{ $lombas->appends(request()->query())->links() }}</div>
-        @endif
+                    <p class="text-md text-gray-600 mb-4">Diselenggarakan oleh:
+                        <strong>{{ $lomba->penyelenggara_lomba }}</strong></p>
 
-        <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-2xl font-bold mb-4 text-sky-800">Statistik Lomba</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                        <div>
-                            <p class="text-gray-500">Total Lomba</p>
-                            <p class="text-2xl font-bold">{{ $stats['total_lomba'] }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Available</p>
-                            <p class="text-2xl font-bold text-green-600">{{ $stats['total_available'] }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Unavailable</p>
-                            <p class="text-2xl font-bold text-red-600">{{ $stats['total_unavailable'] }}</p>
+                    <div class="mt-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-3">Deskripsi Lomba</h2>
+                        <div class="prose max-w-none text-gray-700">
+                            <p>{{ $lomba->deskripsi }}</p>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="lg:col-span-1">
-                <div class="bg-white p-6 rounded-xl shadow-lg h-full">
-                    <h3 class="text-2xl font-bold mb-4 text-sky-800">Lomba Terbaru</h3>
-                    <ul class="space-y-3">@foreach($lombaTerbaru as $lomba)<li
-                        class="flex justify-between items-center text-sm">
-                        <div>
-                            <p class="font-semibold">{{ $lomba->nama_lomba }}</p>
-                            <p class="text-gray-500">{{ $lomba->penyelenggara_lomba }}</p>
-                        </div><span class="text-gray-500">{{ $lomba->created_at->diffForHumans() }}</span>
-                    </li>@endforeach</ul>
+
+                    @if($lomba->hadiah->isNotEmpty())
+                        <div class="mt-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-3">Hadiah</h2>
+                            <ul class="list-disc list-inside text-gray-700">
+                                @foreach($lomba->hadiah as $item)
+                                    <li><strong>{{ $item->posisi }}:</strong> {{ $item->deskripsi }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <a href="{{ $lomba->link_daftar }}" target="_blank"
+                            class="bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors">
+                            Kunjungi Laman Pendaftaran
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
