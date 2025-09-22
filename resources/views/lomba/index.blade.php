@@ -8,20 +8,19 @@
     {{-- css compile vite --}}
     @vite('resources/css/app.css')
 </head>
-
-<body class="bg-sky-100 text-gray-800"> {{-- bg --}}
+<body class="bg-sky-100 text-gray-800">
     <div class="container mx-auto p-4 md:p-8">
-        <h1 class="text-4xl font-bold text-center text-sky-800 mb-6">Info Lomba</h1>
+        <h1 class="text-4xl font-bold text-center text-sky-800 mb-6">🏆 Info Lomba Nasional 🏆</h1>
 
         <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <form action="{{ route('lomba.index') }}" method="GET">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div class="md:col-span-6">
+                    <div class="md:col-span-4">
                         <input type="text" name="search"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500"
                             placeholder="Cari judul lomba..." value="{{ request('search') }}">
                     </div>
-                    <div class="md:col-span-4">
+                    <div class="md:col-span-3">
                         <select name="penyelenggara"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
                             <option value="">Semua Penyelenggara</option>
@@ -31,7 +30,34 @@
                             @endforeach
                         </select>
                     </div>
+
                     <div class="md:col-span-2">
+                        <select name="bidang"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
+                            <option value="">Semua Bidang</option>
+                            @foreach($bidang_lombas as $bidang)
+                                <option value="{{ $bidang->id }}" {{ request('bidang') == $bidang->id ? 'selected' : '' }}>
+                                    {{ $bidang->nama_bidang }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- TAMBAHKAN DROPDOWN FILTER KATEGORI DI SINI --}}
+                    <div class="md:col-span-2">
+                        <select name="kategori"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
+                            <option value="">Semua Kategori</option>
+                            @foreach($kategori_peserta as $kategori)
+                                <option value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
+                                    {{ $kategori }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    {{-- AKHIR DARI DROPDOWN FILTER --}}
+
+                    <div class="md:col-span-1">
                         <button type="submit"
                             class="w-full bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition duration-300">
                             Cari

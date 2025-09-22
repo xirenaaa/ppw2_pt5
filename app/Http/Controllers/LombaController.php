@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lomba;
+use App\Models\BidangLomba;
 use Illuminate\Http\Request;
 
 class LombaController extends Controller
@@ -17,23 +18,28 @@ class LombaController extends Controller
     {
         $query = Lomba::query();
 
-        // SOAL 3: filtering by kategori
+        // Filter Penyelenggara
         if ($request->filled('penyelenggara')) {
             $query->where('penyelenggara_lomba', $request->penyelenggara);
         }
-        
-        // SOAL 5: search jdul
-        if ($request->filled('search')) {
-            $query->where('judul', 'like', '%' . $request->search . '%');
+
+        // Filter Bidang Lomba
+        if ($request->filled('bidang')) {
+            $query->where('id_bidang', $request->bidang);
         }
 
-        // pagination
+        // Filter Kategori Peserta
+        if ($request->filled('kategori')) {
+            $query->where('kategori_peserta', $request->kategori);
+        }
+
+        // Pencarian Judul
+        if ($request->filled('search')) {
+            $query->where('nama_lomba', 'like', '%' . $request->search . '%');
+        }
+
         $lombas = $query->latest()->paginate(6);
-        
-        // SOAL 2: Tampilkan 5 lomba
         $lombaTerbaru = Lomba::latest()->take(5)->get();
-        
-        // SOAL 4: Statistik
         $stats = [
             'total_lomba' => Lomba::count(),
             'total_available' => Lomba::where('status', 'available')->count(),
@@ -44,12 +50,17 @@ class LombaController extends Controller
             ->distinct()
             ->orderBy('penyelenggara_lomba')
             ->pluck('penyelenggara_lomba');
+            
+        $bidang_lombas = BidangLomba::orderBy('nama_bidang')->get();
+        $kategori_peserta = ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum'];
 
         return view('lomba.index', [
             'lombas' => $lombas,
             'lombaTerbaru' => $lombaTerbaru,
             'stats' => $stats,
-            'penyelenggara' => $penyelenggara
+            'penyelenggara' => $penyelenggara,
+            'bidang_lombas' => $bidang_lombas,
+            'kategori_peserta' => $kategori_peserta
         ]);
     }
     public function edit(Lomba $lomba)
@@ -63,7 +74,6 @@ public function update(Request $request, Lomba $lomba)
         'judul' => 'required|string|max:255',
         'penyelenggara_lomba' => 'required|string|max:255',
         'deskripsi' => 'required|string',
-        'harga' => 'required|numeric',
     ]);
 
     $lomba->update($validated);
