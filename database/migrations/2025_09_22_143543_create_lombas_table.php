@@ -9,14 +9,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lombas', function (Blueprint $table) {
-            $table->id();
-            $table->string('judul');
-            $table->string('penyelenggara');
+            $table->integer('id_lomba');
+            $table->string('nama_lomba');
             $table->text('deskripsi');
-            $table->enum('kategori', ['Online', 'Offline']);
-            $table->decimal('harga', 10, 2);
             $table->date('tgl_lomba');
-            $table->timestamps();
+            $table->string('lokasi');
+            $table->string('link_daftar', 500);
+            $table->string('gambar');
+            $table->string('penyelenggara_lomba');
+            $table->enum('status', ['available', 'unavailable'])->default('available');
+            $table->integer('id_bidang')->nullable();
+            $table->enum('kategori_peserta', ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum'])->default('Umum');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

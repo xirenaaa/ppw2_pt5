@@ -48,21 +48,34 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($lombas as $lomba)
-                    {{-- Card --}}
-                    <div
-                        class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                    <a href="{{ route('lomba.show', $lomba) }}"
+                        class="block bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
                         <div class="p-6">
-                            <h2 class="text-xl font-bold text-gray-900">{{ $lomba->judul }}</h2>
-                            <p class="text-sm text-gray-600 mt-1">{{ $lomba->penyelenggara }}</p>
-                            <p class="text-gray-700 mt-4">{{ Str::limit($lomba->deskripsi, 100) }}</p>
+                            <h2 class="text-xl font-bold text-gray-900 truncate">{{ $lomba->nama_lomba }}</h2>
+                            <p class="text-sm text-gray-600 mt-1">{{ $lomba->penyelenggara_lomba }}</p>
+                            <p class="text-gray-700 mt-4 h-20 overflow-hidden">
+                                {{ Str::limit($lomba->deskripsi, 120) }}
+                            </p>
                         </div>
-                        <div class="bg-gray-50 px-6 py-3 flex justify-between items-center">
-                            <span
-                                class="inline-block bg-sky-200 text-sky-800 text-xs font-semibold px-2.5 py-1 rounded-full">{{ $lomba->kategori }}</span>
-                            <span class="text-lg font-bold text-gray-900">Rp
-                                {{ number_format($lomba->harga, 0, ',', '.') }}</span>
+                        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-right">
+                            <span class="text-sm font-semibold text-sky-600">Lihat Detail &rarr;</span>
                         </div>
-                    </div>
+                    </a>
+                        {{-- Card --}}
+                        <div
+                            class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                            <div class="p-6">
+                                <h2 class="text-xl font-bold text-gray-900">{{ $lomba->judul }}</h2>
+                                <p class="text-sm text-gray-600 mt-1">{{ $lomba->penyelenggara }}</p>
+                                <p class="text-gray-700 mt-4">{{ Str::limit($lomba->deskripsi, 100) }}</p>
+                            </div>
+                            <div class="bg-gray-50 px-6 py-3 flex justify-between items-center">
+                                <span
+                                    class="inline-block bg-sky-200 text-sky-800 text-xs font-semibold px-2.5 py-1 rounded-full">{{ $lomba->kategori }}</span>
+                                <span class="text-lg font-bold text-gray-900">Rp
+                                    {{ number_format($lomba->harga, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
                 @endforeach
             </div>
             <div class="mt-8">

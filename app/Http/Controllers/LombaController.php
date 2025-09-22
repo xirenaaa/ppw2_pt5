@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class LombaController extends Controller
 {
+    public function show(Lomba $lomba)
+    {
+    $lomba->load('bidang', 'hadiah');
+    return view('lomba.show', ['lomba' => $lomba]);
+    }
+    
     public function index(Request $request)
     {
         $query = Lomba::query();
