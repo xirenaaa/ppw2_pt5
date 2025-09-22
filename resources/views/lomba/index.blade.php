@@ -26,10 +26,15 @@
                         </select></div>
                     <div class="md:col-span-2"><select name="bidang"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">Semua Bidang</option>@foreach($bidang_lombas as $bidang)<option
-                                value="{{ $bidang->id }}" {{ request('bidang') == $bidang->id ? 'selected' : '' }}>
-                            {{ $bidang->nama_bidang }}</option>@endforeach
-                        </select></div>
+                            <option value="">Semua Bidang</option>
+                            @foreach($bidang_lombas as $bidang)
+                                <option value="{{ $bidang->id_bidang }}" 
+                                    {{ request('bidang') == $bidang->id_bidang ? 'selected' : '' }}>
+                                    {{ $bidang->nama_bidang }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="md:col-span-2"><select name="kategori"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                             <option value="">Semua Kategori</option>@foreach($kategori_peserta as $kategori)<option
@@ -49,17 +54,53 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($lombas as $lomba)
-                    <a href="{{ route('lomba.show', $lomba) }}"
-                        class="block bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <img src="{{ asset($lomba->gambar) }}" alt="{{ $lomba->nama_lomba }}" 
+                             class="w-full h-48 object-cover">
                         <div class="p-6">
-                            <h2 class="text-xl font-bold text-gray-900 truncate">{{ $lomba->nama_lomba }}</h2>
-                            <p class="text-sm text-gray-600 mt-1">{{ $lomba->penyelenggara_lomba }}</p>
-                            <p class="text-gray-700 mt-4 h-20 overflow-hidden">{{ Str::limit($lomba->deskripsi, 120) }}</p>
+                            <div class="flex justify-between items-start mb-2">
+                                <h2 class="text-xl font-bold text-gray-900 flex-1">{{ $lomba->nama_lomba }}</h2>
+                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                                    {{ $lomba->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $lomba->status }}
+                                </span>
+                            </div>
+                            
+                            <p class="text-sm text-gray-600 mb-2">{{ $lomba->penyelenggara_lomba }}</p>
+                            <p class="text-sm text-gray-500 mb-1">
+                                <span class="font-semibold">Bidang:</span> 
+                                {{ $lomba->bidang->nama_bidang ?? 'Tidak ada' }}
+                            </p>
+                            <p class="text-sm text-gray-500 mb-3">
+                                <span class="font-semibold">Kategori:</span> 
+                                {{ $lomba->kategori_peserta }}
+                            </p>
+                            
+                            <div class="flex gap-2 mb-4">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                    {{ $lomba->lokasi }}
+                                </span>
+                                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+                                    {{ \Carbon\Carbon::parse($lomba->tgl_lomba)->format('d M Y') }}
+                                </span>
+                            </div>
+                            
+                            <p class="text-gray-700 mb-4 h-20 overflow-hidden">
+                                {{ Str::limit($lomba->deskripsi, 100) }}
+                            </p>
+                            
+                            <div class="flex justify-between items-center mt-4">
+                                <a href="{{ route('lomba.show', $lomba) }}" 
+                                   class="text-sky-600 hover:text-sky-800 text-sm font-semibold">
+                                    Lihat Detail →
+                                </a>
+                                <a href="{{ $lomba->link_daftar }}" target="_blank"
+                                   class="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-sky-700">
+                                    Daftar
+                                </a>
+                            </div>
                         </div>
-                        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-right">
-                            <span class="text-sm font-semibold text-sky-600">Lihat Detail &rarr;</span>
-                        </div>
-                    </a>
+                    </div>
                 @endforeach
             </div>
             <div class="mt-8">{{ $lombas->appends(request()->query())->links() }}</div>
@@ -76,11 +117,11 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Available</p>
-                            <p class="text-2xl font-bold text-green-600">{{ $stats['lomba_available'] }}</p>
+                            <p class="text-2xl font-bold text-green-600">{{ $stats['total_available'] }}</p>
                         </div>
                         <div>
                             <p class="text-gray-500">Unavailable</p>
-                            <p class="text-2xl font-bold text-red-600">{{ $stats['lomba_unavailable'] }}</p>
+                            <p class="text-2xl font-bold text-red-600">{{ $stats['total_unavailable'] }}</p>
                         </div>
                     </div>
                 </div>
