@@ -8,10 +8,11 @@ class BidangLomba extends Model
 {
     protected $table = 'bidang_lombas';
     protected $primaryKey = 'id_bidang';
-    protected $guarded = [];
+    protected $fillable = ['id_bidang', 'nama_bidang'];
+    public $incrementing = false;
 
     public function lombas()
     {
-        return $this->hasMany(Lomba::class, 'id_bidang', 'id_bidang');
+        return $this->hasMany(Lomba::class, 'id_bidang');
     }
 }

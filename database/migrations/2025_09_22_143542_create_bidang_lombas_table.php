@@ -1,18 +1,22 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-
-class BidangLomba extends Model
+return new class extends Migration
 {
-    protected $table = 'bidang_lombas';
-    protected $primaryKey = 'id_bidang';
-
-    protected $fillable = ['nama_bidang'];
-
-    public function lombas()
+    public function up(): void
     {
-        return $this->hasMany(Lomba::class, 'id_bidang', 'id_bidang');
+        Schema::create('bidang_lombas', function (Blueprint $table) {
+            $table->integer('id_bidang')->primary();
+            $table->string('nama_bidang');
+            $table->timestamps();
+        });
     }
-}
+
+    public function down(): void
+    {
+        Schema::dropIfExists('bidang_lombas');
+    }
+};

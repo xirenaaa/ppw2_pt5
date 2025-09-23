@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Info Lomba</title>
-    @vite('resources/css/app.css')
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-sky-100 text-gray-800">
@@ -15,17 +15,23 @@
         <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <form action="{{ route('lomba.index') }}" method="GET">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div class="md:col-span-4"><input type="text" name="search"
+                    <div class="md:col-span-4">
+                        <input type="text" name="search"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Cari judul lomba..."
-                            value="{{ request('search') }}"></div>
-                    <div class="md:col-span-3"><select name="penyelenggara"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">Semua Penyelenggara</option>@foreach($penyelenggara as $p)<option
-                                value="{{ $p }}" {{ request('penyelenggara') == $p ? 'selected' : '' }}>{{ $p }}</option>
+                            value="{{ request('search') }}">
+                    </div>
+                    <div class="md:col-span-3">
+                        <select name="penyelenggara" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="">Semua Penyelenggara</option>
+                            @foreach($penyelenggara as $p)
+                                <option value="{{ $p }}" {{ request('penyelenggara') == $p ? 'selected' : '' }}>
+                                    {{ $p }}
+                                </option>
                             @endforeach
-                        </select></div>
-                    <div class="md:col-span-2"><select name="bidang"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <select name="bidang" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                             <option value="">Semua Bidang</option>
                             @foreach($bidang_lombas as $bidang)
                                 <option value="{{ $bidang->id_bidang }}" 
@@ -35,13 +41,18 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="md:col-span-2"><select name="kategori"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">Semua Kategori</option>@foreach($kategori_peserta as $kategori)<option
-                                value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
-                            {{ $kategori }}</option>@endforeach
-                        </select></div>
-                    <div class="md:col-span-1"><button type="submit"
+                    <div class="md:col-span-2">
+                        <select name="kategori" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="">Semua Kategori</option>
+                            @foreach($kategori_peserta as $kategori)
+                                <option value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
+                                    {{ $kategori }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="md:col-span-1">
+                        <button type="submit"
                             class="w-full bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700">Cari</button>
                     </div>
                 </div>
@@ -50,58 +61,62 @@
 
         @if($lombas->isEmpty())
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg text-center">
-                Lomba tidak ditemukan.
+                <p class="text-lg font-semibold">Lomba tidak ditemukan.</p>
+                <p class="text-sm mt-2">Coba ubah kriteria pencarian atau <a href="{{ route('lomba.index') }}" class="text-blue-600 underline">lihat semua lomba</a>.</p>
             </div>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($lombas as $lomba)
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                         <img src="{{ asset($lomba->gambar) }}" 
                              alt="{{ $lomba->nama_lomba }}" 
-                             class="w-full h-48 object-cover">
-                        <div class="p-6">
+                             class="w-full h-40 object-cover"
+                             onerror="this.src='https://via.placeholder.com/400x200/e5e7eb/9ca3af?text=No+Image'">
+                        <div class="p-4">
                             <div class="flex justify-between items-start mb-2">
-                                <h2 class="text-xl font-bold text-gray-900 flex-1 line-clamp-2">
+                                <h2 class="text-lg font-bold text-gray-900 line-clamp-2 flex-1">
                                     {{ $lomba->nama_lomba }}
                                 </h2>
-                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ml-2
+                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ml-2 shrink-0
                                     {{ $lomba->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $lomba->status }}
+                                    {{ ucfirst($lomba->status) }}
                                 </span>
                             </div>
                             
-                            <p class="text-sm text-gray-600 mb-2">{{ $lomba->penyelenggara_lomba }}</p>
+                            <p class="text-sm text-gray-600 mb-2 line-clamp-1">{{ $lomba->penyelenggara_lomba }}</p>
                             
-                            <div class="flex flex-wrap gap-2 mb-3">
-                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
-                                    {{ $lomba->bidang->nama_bidang ?? 'Tidak ada bidang' }}
-                                </span>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                @if(isset($lomba->bidang) && $lomba->bidang)
+                                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                                        {{ $lomba->bidang->nama_bidang }}
+                                    </span>
+                                @endif
                                 <span class="bg-sky-100 text-sky-800 text-xs px-2 py-1 rounded">
                                     {{ $lomba->kategori_peserta }}
                                 </span>
                             </div>
                             
-                            <div class="flex gap-2 mb-4">
+                            <div class="flex gap-1 mb-3">
                                 <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                                     {{ $lomba->lokasi }}
                                 </span>
                                 <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
-                                    {{ \Carbon\Carbon::parse($lomba->tgl_lomba)->isoFormat('D MMM Y') }}
+                                    {{ \Carbon\Carbon::parse($lomba->tgl_lomba)->format('d M Y') }}
                                 </span>
                             </div>
                             
-                            <p class="text-gray-700 mb-4 line-clamp-3">
-                                {{ $lomba->deskripsi }}
+                            <p class="text-gray-700 text-sm mb-4 line-clamp-2">
+                                {{ Str::limit($lomba->deskripsi, 80) }}
                             </p>
                             
-                            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
                                 <a href="{{ route('lomba.show', $lomba->id_lomba) }}" 
                                    class="text-sky-600 hover:text-sky-800 text-sm font-semibold">
-                                    Lihat Detail →
+                                    Detail →
                                 </a>
                                 <a href="{{ $lomba->link_daftar }}" 
                                    target="_blank"
-                                   class="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-sky-700 transition">
+                                   class="bg-sky-600 text-white px-3 py-1 rounded text-sm hover:bg-sky-700 transition">
                                     Daftar
                                 </a>
                             </div>
@@ -110,7 +125,7 @@
                 @endforeach
             </div>
             
-            <div class="mt-8">
+            <div class="mt-8 flex justify-center">
                 {{ $lombas->appends(request()->query())->links() }}
             </div>
         @endif
