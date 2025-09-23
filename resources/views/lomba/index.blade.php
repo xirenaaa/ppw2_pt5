@@ -1,4 +1,3 @@
-<!-- filepath: c:\Users\Lenovo\ppw2_pt5\resources\views\lomba\index.blade.php -->
 <!DOCTYPE html>
 <html lang="id">
 
@@ -63,7 +62,7 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="gradient-header rounded-2xl p-8 mb-8 text-center text-white shadow-lg">
-            <h1 class="text-5xl font-bold mb-4 drop-shadow-lg">Info Lomba</h1>
+            <h1 class="text-5xl font-bold mb-4 drop-shadow-lg">Info Lomba Terbaru</h1>
             <p class="text-xl opacity-90">Temukan berbagai lomba menarik dan tingkatkan kemampuanmu!</p>
         </div>
 
@@ -119,6 +118,83 @@
             </form>
         </div>
 
+        <!-- Latest Lomba Section -->
+        <div class="card-gradient p-8 rounded-2xl shadow-lg mb-8 border border-sky-100">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-bold text-sky-900">
+                    <i class></i>Lomba Terbaru
+                </h2>
+                <div class="text-sm text-sky-600 font-medium">
+                    <i class="fas fa-clock mr-1"></i>
+                    Diperbarui {{ now()->format('d M Y') }}
+                </div>
+            </div>
+
+            @if($lombaTerbaru->isNotEmpty())
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    @foreach($lombaTerbaru as $index => $lomba)
+                        <div
+                            class="bg-white rounded-xl shadow-md overflow-hidden border border-sky-100 transform hover:scale-105 transition-all hover:shadow-lg">
+                            <div class="relative">
+                                <img src="{{ asset($lomba->gambar) }}" alt="{{ $lomba->nama_lomba }}"
+                                    class="w-full h-32 object-cover"
+                                    onerror="this.src='https://via.placeholder.com/300x128/0ea5e9/ffffff?text=Lomba+{{ $index + 1 }}'">
+                                <div class="absolute top-2 left-2">
+                                    <span
+                                        class="bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        NEW
+                                    </span>
+                                </div>
+                                <div class="absolute top-2 right-2">
+                                    <span
+                                        class="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        #{{ $index + 1 }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="p-4">
+                                <h3 class="font-bold text-sm text-sky-900 mb-2 line-clamp-2" style="min-height: 2.5rem;">
+                                    {{ Str::limit($lomba->nama_lomba, 40) }}
+                                </h3>
+
+                                <div class="flex items-center text-xs text-sky-600 mb-2">
+                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                    {{ \Carbon\Carbon::parse($lomba->tgl_lomba)->format('d M Y') }}
+                                </div>
+
+                                <div class="mb-3">
+                                    <p class="text-xs text-gray-600 mb-2">
+                                        <i class="fas fa-building mr-1"></i>
+                                        {{ Str::limit($lomba->penyelenggara_lomba, 25) }}
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-wrap gap-1 mb-3">
+                                    <span class="bg-sky-100 text-sky-800 text-xs px-2 py-1 rounded-full">
+                                        {{ $lomba->kategori_peserta }}
+                                    </span>
+                                    <span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full">
+                                        {{ $lomba->lokasi }}
+                                    </span>
+                                </div>
+
+                                <a href="{{ route('lomba.show', $lomba->id_lomba) }}"
+                                    class="block w-full bg-gradient-to-r from-sky-500 to-sky-600 text-white text-center py-2 rounded-lg hover:from-sky-600 hover:to-sky-700 transition-all text-xs font-bold">
+                                    <i class="fas fa-eye mr-1"></i>Lihat Detail
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-8 text-sky-600">
+                    <i class="fas fa-info-circle text-3xl mb-4"></i>
+                    <p class="text-lg">Belum ada lomba terbaru tersedia</p>
+                </div>
+            @endif
+        </div>
+
         @if($lombas->isEmpty())
             <div
                 class="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 text-amber-800 p-6 rounded-xl text-center shadow-lg">
@@ -132,6 +208,14 @@
                 </p>
             </div>
         @else
+            <!-- All Lomba Section Header -->
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-sky-900">
+                    <i class="fas fa-trophy mr-3 text-yellow-500"></i>Semua Lomba Tersedia
+                </h2>
+                <p class="text-sky-600 mt-2">Jelajahi semua lomba yang tersedia dan temukan yang sesuai dengan minatmu</p>
+            </div>
+
             <!-- Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                 @foreach($lombas as $lomba)

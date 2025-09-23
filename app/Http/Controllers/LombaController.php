@@ -13,20 +13,6 @@ class LombaController extends Controller
 {
     public function index(Request $request)
     {
-        // Debug: Check if data exists and force seed if empty
-        $totalLombas = Lomba::count();
-        if ($totalLombas == 0) {
-            // Run the specific seeders in order
-            try {
-                Artisan::call('db:seed', ['--class' => 'BidangLombaSeeder', '--force' => true]);
-                Artisan::call('db:seed', ['--class' => 'LombaSeeder', '--force' => true]);
-                Artisan::call('db:seed', ['--class' => 'HadiahSeeder', '--force' => true]);
-            } catch (\Exception $e) {
-                // Log error but continue
-                Log::error('Seeding error: ' . $e->getMessage());
-            }
-        }
-
         // Start with base query including relationships
         $query = Lomba::with(['bidang', 'hadiah']);
 
@@ -44,20 +30,17 @@ class LombaController extends Controller
             $query->where('kategori_peserta', $request->kategori);
         }
 
-        // Get all available lomba data first
+        // Get paginated results with relationships
         $lombas = $query->where('status', 'available')
                        ->orderBy('tgl_lomba', 'asc')
                        ->paginate(12);
-        
-        // If still no data after seeding, get all data regardless of status for debugging
-        if ($lombas->isEmpty()) {
-            $lombas = Lomba::with(['bidang', 'hadiah'])
-                          ->orderBy('id_lomba', 'asc')
-                          ->paginate(12);
-        }
 
-        // Get additional data for sidebar/filters
-        $lombaTerbaru = Lomba::with('bidang')->orderBy('created_at', 'desc')->take(5)->get();
+        // Get latest 5 lomba based on created_at for "Lomba Terbaru" section
+        $lombaTerbaru = Lomba::with('bidang')
+            ->where('status', 'available')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
         
         $stats = [
             'total_lomba' => Lomba::count(),
