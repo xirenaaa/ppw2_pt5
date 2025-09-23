@@ -211,7 +211,7 @@
             <!-- All Lomba Section Header -->
             <div class="mb-6">
                 <h2 class="text-3xl font-bold text-sky-900">
-                    <i class="fas fa-trophy mr-3 text-yellow-500"></i>Semua Lomba Tersedia
+                    <i class="text-yellow-500"></i>Semua Lomba Tersedia
                 </h2>
                 <p class="text-sky-600 mt-2">Jelajahi semua lomba yang tersedia dan temukan yang sesuai dengan minatmu</p>
             </div>
