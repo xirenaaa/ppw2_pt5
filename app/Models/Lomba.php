@@ -11,6 +11,8 @@ class Lomba extends Model
     protected $table = 'lombas';
     protected $primaryKey = 'id_lomba';
     protected $guarded = [];
+    public $incrementing = false;
+    protected $keyType = 'int';
 
     /**
      * Mendefinisikan relasi ke model BidangLomba.
