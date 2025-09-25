@@ -14,7 +14,7 @@
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{{ route('lomba.index') }}"
-                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-gray-700 transition">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Kembali ke Daftar Lomba
             </a>
