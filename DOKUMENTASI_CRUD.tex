@@ -1,0 +1,576 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[indonesian]{babel}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\geometry{left=3cm,right=3cm,top=3cm,bottom=3cm}
+
+% Setup untuk code highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Fitur CRUD Lengkap}
+\lhead{Sistem Informasi Lomba}
+\cfoot{\thepage}
+
+\title{\textbf{Implementasi Fitur CRUD Lengkap \\ Sistem Informasi Lomba: \\ Create, Read, Update, Delete}}
+\author{Dokumentasi Sistem}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Pendahuluan}
+
+Dalam pengembangan aplikasi web yang dinamis, fitur CRUD (Create, Read, Update, Delete) merupakan fondasi yang memungkinkan pengelolaan data secara menyeluruh. Dokumen ini menjelaskan implementasi lengkap fitur CRUD pada Sistem Informasi Lomba yang mencakup penambahan, pembacaan, pembaruan, dan penghapusan data lomba.
+
+\subsection{Fitur yang Diimplementasikan}
+
+Implementasi ini mencakup:
+\begin{itemize}
+    \item \textbf{Create}: Menambah lomba baru dengan form yang lengkap
+    \item \textbf{Read}: Menampilkan daftar lomba dan detail lomba
+    \item \textbf{Update}: Mengubah informasi lomba yang sudah ada
+    \item \textbf{Delete}: Menghapus lomba dari sistem
+    \item \textbf{Upload Gambar}: Mengelola gambar lomba
+    \item \textbf{Validasi}: Memastikan data yang masuk valid
+\end{itemize}
+
+\section{Konfigurasi Route}
+
+\subsection{Penjelasan Route CRUD}
+
+File \texttt{routes/web.php} dikonfigurasi dengan route untuk semua operasi CRUD:
+
+\begin{lstlisting}[language=PHP]
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LombaController;
+
+// Public routes
+Route::get('/', [LombaController::class, 'index'])->name('home');
+Route::get('/lomba', [LombaController::class, 'index'])->name('lomba.index');
+Route::get('/lomba/{lomba}', [LombaController::class, 'show'])->name('lomba.show');
+
+// CRUD routes
+Route::get('/lomba/create/new', [LombaController::class, 'create'])->name('lomba.create');
+Route::post('/lomba', [LombaController::class, 'store'])->name('lomba.store');
+Route::get('/lomba/{lomba}/edit', [LombaController::class, 'edit'])->name('lomba.edit');
+Route::put('/lomba/{lomba}', [LombaController::class, 'update'])->name('lomba.update');
+Route::delete('/lomba/{lomba}', [LombaController::class, 'destroy'])->name('lomba.destroy');
+\end{lstlisting}
+
+\subsection{Penjelasan Setiap Route}
+
+\begin{itemize}
+    \item \texttt{GET /lomba/create/new} - Menampilkan form tambah lomba baru. Path menggunakan \texttt{/create/new} untuk menghindari konflik dengan route model binding.
+    
+    \item \texttt{POST /lomba} - Menyimpan data lomba baru ke database. Menggunakan method POST sesuai standar RESTful.
+    
+    \item \texttt{GET /lomba/\{lomba\}/edit} - Menampilkan form edit dengan data lomba yang dipilih. Route model binding otomatis mengambil data lomba berdasarkan ID.
+    
+    \item \texttt{PUT /lomba/\{lomba\}} - Mengupdate data lomba di database. Method PUT digunakan untuk update sesuai konvensi RESTful.
+    
+    \item \texttt{DELETE /lomba/\{lomba\}} - Menghapus data lomba dari database. Method DELETE untuk operasi penghapusan.
+\end{itemize}
+
+\section{Controller: Logika Bisnis}
+
+\subsection{Method Create}
+
+Method ini menampilkan form untuk membuat lomba baru:
+
+\begin{lstlisting}[language=PHP]
+public function create()
+{
+    $bidang_lombas = BidangLomba::orderBy('nama_bidang')->get();
+    $kategori_peserta = ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum', 'Pelajar'];
+    $lokasi_options = ['Online', 'Offline', 'Hybrid'];
+    
+    return view('lomba.create', compact('bidang_lombas', 'kategori_peserta', 'lokasi_options'));
+}
+\end{lstlisting}
+
+\textbf{Penjelasan Alur:}
+\begin{enumerate}
+    \item Mengambil semua data bidang lomba dari database, diurutkan alfabetis
+    \item Menyiapkan array kategori peserta untuk dropdown
+    \item Menyiapkan array lokasi lomba (Online/Offline/Hybrid)
+    \item Mengirim data ke view create menggunakan \texttt{compact()}
+\end{enumerate}
+
+\subsection{Method Store}
+
+Method ini menyimpan data lomba baru ke database:
+
+\begin{lstlisting}[language=PHP]
+public function store(Request $request)
+{
+    // Validasi input
+    $validated = $request->validate([
+        'nama_lomba' => 'required|string|max:255',
+        'deskripsi' => 'required|string',
+        'penyelenggara_lomba' => 'required|string|max:255',
+        'tgl_lomba' => 'required|date',
+        'lokasi' => 'required|in:Online,Offline,Hybrid',
+        'kategori_peserta' => 'required|in:SD,SMP,SMA,Mahasiswa,Umum,Pelajar',
+        'id_bidang' => 'required|exists:bidang_lombas,id_bidang',
+        'link_daftar' => 'nullable|url',
+        'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'status' => 'required|in:available,unavailable'
+    ]);
+    
+    // Generate ID baru
+    $lastLomba = Lomba::orderBy('id_lomba', 'desc')->first();
+    $newId = $lastLomba ? $lastLomba->id_lomba + 1 : 1;
+    
+    // Handle upload gambar
+    if ($request->hasFile('gambar')) {
+        $file = $request->file('gambar');
+        $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+        $file->move(public_path('uploads'), $filename);
+        $validated['gambar'] = 'uploads/' . $filename;
+    } else {
+        $validated['gambar'] = 'uploads/default-lomba.jpg';
+    }
+    
+    // Tambahkan ID ke validated data
+    $validated['id_lomba'] = $newId;
+    
+    // Simpan ke database
+    Lomba::create($validated);
+    
+    return redirect()->route('lomba.index')
+        ->with('success', 'Lomba berhasil ditambahkan!');
+}
+\end{lstlisting}
+
+\textbf{Penjelasan Alur Store:}
+\begin{enumerate}
+    \item \textbf{Validasi Input}: Setiap field divalidasi dengan aturan tertentu:
+    \begin{itemize}
+        \item \texttt{required}: Field wajib diisi
+        \item \texttt{string}: Harus berupa teks
+        \item \texttt{max:255}: Maksimal 255 karakter
+        \item \texttt{date}: Harus format tanggal valid
+        \item \texttt{in:}: Harus salah satu dari nilai yang ditentukan
+        \item \texttt{exists:}: Harus ada di tabel yang dirujuk
+        \item \texttt{nullable}: Boleh kosong
+        \item \texttt{url}: Harus format URL valid
+        \item \texttt{image}: Harus file gambar
+        \item \texttt{mimes:}: Hanya format tertentu yang diterima
+        \item \texttt{max:5120}: Maksimal 5MB (5120 KB)
+    \end{itemize}
+    
+    \item \textbf{Generate ID}: Karena primary key bukan auto-increment, ID digenerate manual dengan mengambil ID terakhir + 1
+    
+    \item \textbf{Upload Gambar}:
+    \begin{itemize}
+        \item Cek apakah ada file yang diupload
+        \item Generate nama file unik dengan timestamp
+        \item Sanitasi nama file dengan regex
+        \item Pindahkan file ke folder \texttt{public/uploads}
+        \item Simpan path relatif ke database
+        \item Jika tidak ada upload, gunakan gambar default
+    \end{itemize}
+    
+    \item \textbf{Simpan ke Database}: Menggunakan method \texttt{create()} untuk mass assignment
+    
+    \item \textbf{Redirect}: Kembali ke halaman index dengan flash message sukses
+\end{enumerate}
+
+\subsection{Method Edit}
+
+Method ini menampilkan form edit dengan data lomba:
+
+\begin{lstlisting}[language=PHP]
+public function edit(Lomba $lomba)
+{
+    $bidang_lombas = BidangLomba::orderBy('nama_bidang')->get();
+    $kategori_peserta = ['SD', 'SMP', 'SMA', 'Mahasiswa', 'Umum', 'Pelajar'];
+    $lokasi_options = ['Online', 'Offline', 'Hybrid'];
+    
+    return view('lomba.edit', compact('lomba', 'bidang_lombas', 'kategori_peserta', 'lokasi_options'));
+}
+\end{lstlisting}
+
+\textbf{Penjelasan:}
+\begin{itemize}
+    \item Route model binding otomatis mengambil data lomba berdasarkan ID dari URL
+    \item Data lomba dikirim ke view bersama data pendukung untuk dropdown
+    \item Form akan diisi dengan data lomba yang ada (pre-populated)
+\end{itemize}
+
+\subsection{Method Update}
+
+Method ini mengupdate data lomba di database:
+
+\begin{lstlisting}[language=PHP]
+public function update(Request $request, Lomba $lomba)
+{
+    // Validasi input (sama seperti store)
+    $validated = $request->validate([
+        'nama_lomba' => 'required|string|max:255',
+        'deskripsi' => 'required|string',
+        'penyelenggara_lomba' => 'required|string|max:255',
+        'tgl_lomba' => 'required|date',
+        'lokasi' => 'required|in:Online,Offline,Hybrid',
+        'kategori_peserta' => 'required|in:SD,SMP,SMA,Mahasiswa,Umum,Pelajar',
+        'id_bidang' => 'required|exists:bidang_lombas,id_bidang',
+        'link_daftar' => 'nullable|url',
+        'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'status' => 'required|in:available,unavailable'
+    ]);
+    
+    // Handle upload gambar baru
+    if ($request->hasFile('gambar')) {
+        // Hapus gambar lama jika bukan default
+        if ($lomba->gambar && $lomba->gambar !== 'uploads/default-lomba.jpg' 
+            && file_exists(public_path($lomba->gambar))) {
+            unlink(public_path($lomba->gambar));
+        }
+        
+        // Upload gambar baru
+        $file = $request->file('gambar');
+        $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+        $file->move(public_path('uploads'), $filename);
+        $validated['gambar'] = 'uploads/' . $filename;
+    }
+    
+    // Update data
+    $lomba->update($validated);
+    
+    return redirect()->route('lomba.index')
+        ->with('success', 'Lomba berhasil diupdate!');
+}
+\end{lstlisting}
+
+\textbf{Perbedaan dengan Store:}
+\begin{enumerate}
+    \item Tidak perlu generate ID baru
+    \item Sebelum upload gambar baru, hapus gambar lama terlebih dahulu
+    \item Menggunakan method \texttt{update()} bukan \texttt{create()}
+    \item Jika tidak ada upload gambar baru, gambar lama tetap dipertahankan
+\end{enumerate}
+
+\subsection{Method Destroy}
+
+Method ini menghapus lomba dari database:
+
+\begin{lstlisting}[language=PHP]
+public function destroy(Lomba $lomba)
+{
+    // Hapus gambar jika bukan default
+    if ($lomba->gambar && $lomba->gambar !== 'uploads/default-lomba.jpg' 
+        && file_exists(public_path($lomba->gambar))) {
+        unlink(public_path($lomba->gambar));
+    }
+    
+    // Hapus lomba
+    $lomba->delete();
+    
+    return redirect()->route('lomba.index')
+        ->with('success', 'Lomba berhasil dihapus!');
+}
+\end{lstlisting}
+
+\textbf{Penjelasan Alur Delete:}
+\begin{enumerate}
+    \item Cek apakah lomba memiliki gambar yang bukan default
+    \item Jika ya, hapus file gambar dari server
+    \item Hapus data lomba dari database menggunakan method \texttt{delete()}
+    \item Redirect dengan pesan sukses
+\end{enumerate}
+
+\section{View: Interface Pengguna}
+
+\subsection{Update Index dengan Tombol Aksi}
+
+Pada halaman index, ditambahkan:
+
+\begin{lstlisting}[language=HTML]
+<!-- Success Message -->
+@if(session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-md">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-3 text-xl"></i>
+            <p class="font-medium">{{ session('success') }}</p>
+        </div>
+    </div>
+@endif
+
+<!-- Tombol Tambah Lomba -->
+<div class="mb-6">
+    <a href="{{ route('lomba.create') }}" 
+       class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all shadow-lg">
+        <i class="fas fa-plus-circle mr-2"></i>
+        Tambah Lomba Baru
+    </a>
+</div>
+\end{lstlisting}
+
+Pada setiap card lomba, ditambahkan tombol Edit dan Delete:
+
+\begin{lstlisting}[language=HTML]
+<!-- Tombol Edit dan Delete -->
+<div class="grid grid-cols-2 gap-2">
+    <a href="{{ route('lomba.edit', $lomba->id_lomba) }}"
+        class="block w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-center py-2 px-3 rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all text-xs font-bold shadow-lg transform hover:scale-105">
+        <i class="fas fa-edit mr-1"></i>Edit
+    </a>
+    <form action="{{ route('lomba.destroy', $lomba->id_lomba) }}" method="POST" 
+          onsubmit="return confirm('Yakin ingin menghapus lomba ini?')" 
+          class="w-full">
+        @csrf
+        @method('DELETE')
+        <button type="submit"
+            class="block w-full bg-gradient-to-r from-red-500 to-red-600 text-white text-center py-2 px-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all text-xs font-bold shadow-lg transform hover:scale-105">
+            <i class="fas fa-trash mr-1"></i>Hapus
+        </button>
+    </form>
+</div>
+\end{lstlisting}
+
+\textbf{Penjelasan Tombol Delete:}
+\begin{itemize}
+    \item Menggunakan form dengan method DELETE (spoofing dengan \texttt{@method('DELETE')})
+    \item \texttt{@csrf} untuk keamanan CSRF protection
+    \item JavaScript \texttt{confirm()} untuk konfirmasi sebelum hapus
+    \item Tombol submit dengan styling yang konsisten
+\end{itemize}
+
+\subsection{Form Create}
+
+Form create memiliki fitur:
+\begin{itemize}
+    \item \textbf{Validasi Client-side}: Field required dengan HTML5 validation
+    \item \textbf{Error Messages}: Menampilkan error dari validasi server
+    \item \textbf{Old Input}: Mempertahankan input ketika ada error
+    \item \textbf{Preview Gambar}: JavaScript untuk preview sebelum upload
+    \item \textbf{Responsive Design}: Layout yang adaptif di berbagai device
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript]
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        const output = document.getElementById('preview');
+        const previewDiv = document.getElementById('imagePreview');
+        output.src = reader.result;
+        previewDiv.classList.remove('hidden');
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+\end{lstlisting}
+
+\textbf{Penjelasan Preview Image:}
+\begin{enumerate}
+    \item Membuat FileReader object untuk membaca file
+    \item Ketika file selesai dibaca, update src image preview
+    \item Tampilkan div preview yang awalnya hidden
+    \item Konversi file ke Data URL untuk ditampilkan
+\end{enumerate}
+
+\subsection{Form Edit}
+
+Form edit mirip dengan create, dengan perbedaan:
+\begin{itemize}
+    \item Field pre-populated dengan data lomba yang ada
+    \item Menampilkan gambar saat ini
+    \item Upload gambar bersifat opsional (hanya jika ingin ganti)
+    \item Menggunakan method PUT dengan \texttt{@method('PUT')}
+\end{itemize}
+
+\section{Keamanan dan Validasi}
+
+\subsection{CSRF Protection}
+
+Laravel otomatis melindungi dari serangan CSRF dengan token:
+
+\begin{lstlisting}[language=HTML]
+@csrf
+\end{lstlisting}
+
+Token ini wajib ada di setiap form POST, PUT, PATCH, DELETE.
+
+\subsection{Validasi Input}
+
+Validasi dilakukan di level server menggunakan \texttt{validate()}:
+
+\begin{itemize}
+    \item Mencegah SQL injection
+    \item Memastikan tipe data sesuai
+    \item Memvalidasi format (URL, email, date, dll)
+    \item Membatasi ukuran file upload
+    \item Memvalidasi foreign key exists
+\end{itemize}
+
+\subsection{Sanitasi File Upload}
+
+\begin{lstlisting}[language=PHP]
+$filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+\end{lstlisting}
+
+\begin{itemize}
+    \item Menambahkan timestamp untuk uniqueness
+    \item Menghapus karakter spesial yang berbahaya
+    \item Hanya menerima file gambar dengan validasi mimes
+\end{itemize}
+
+\section{Cara Menggunakan Sistem}
+
+\subsection{Menambah Lomba Baru}
+
+\begin{enumerate}
+    \item Klik tombol "Tambah Lomba Baru" di halaman index
+    \item Isi semua field yang wajib (ditandai *)
+    \item Upload gambar jika ada (opsional)
+    \item Klik "Simpan Lomba"
+    \item Sistem akan validasi dan menyimpan data
+    \item Redirect ke halaman index dengan pesan sukses
+\end{enumerate}
+
+\subsection{Mengedit Lomba}
+
+\begin{enumerate}
+    \item Klik tombol "Edit" pada card lomba yang ingin diubah
+    \item Form akan muncul dengan data terisi
+    \item Ubah field yang diinginkan
+    \item Upload gambar baru jika ingin mengganti (opsional)
+    \item Klik "Update Lomba"
+    \item Data akan terupdate dan redirect ke index
+\end{enumerate}
+
+\subsection{Menghapus Lomba}
+
+\begin{enumerate}
+    \item Klik tombol "Hapus" pada card lomba
+    \item Konfirmasi penghapusan dengan klik OK
+    \item Sistem akan menghapus gambar dan data lomba
+    \item Redirect ke index dengan pesan sukses
+\end{enumerate}
+
+\section{Testing Fitur CRUD}
+
+\subsection{Test Case yang Harus Dijalankan}
+
+\begin{enumerate}
+    \item \textbf{Test Create}:
+    \begin{itemize}
+        \item Tambah lomba dengan semua field valid
+        \item Tambah lomba tanpa gambar (gunakan default)
+        \item Coba submit form dengan field kosong (validasi error)
+        \item Coba upload file bukan gambar (validasi error)
+        \item Coba upload gambar > 5MB (validasi error)
+    \end{itemize}
+    
+    \item \textbf{Test Read}:
+    \begin{itemize}
+        \item Lihat daftar lomba di index
+        \item Klik detail lomba
+        \item Cek apakah data tampil lengkap
+    \end{itemize}
+    
+    \item \textbf{Test Update}:
+    \begin{itemize}
+        \item Edit lomba dan ubah beberapa field
+        \item Edit dan ganti gambar
+        \item Edit tanpa ganti gambar
+        \item Coba submit dengan field tidak valid
+    \end{itemize}
+    
+    \item \textbf{Test Delete}:
+    \begin{itemize}
+        \item Hapus lomba dengan gambar custom
+        \item Hapus lomba dengan gambar default
+        \item Cek apakah file gambar terhapus dari server
+        \item Konfirmasi data hilang dari database
+    \end{itemize}
+\end{enumerate}
+
+\section{Troubleshooting}
+
+\subsection{Error Upload Gambar}
+
+Jika gagal upload gambar:
+\begin{enumerate}
+    \item Pastikan folder \texttt{public/uploads} ada dan writable
+    \item Cek permission folder (755 atau 777)
+    \item Pastikan ukuran file tidak melebihi limit PHP (\texttt{upload\_max\_filesize})
+    \item Cek \texttt{post\_max\_size} di php.ini
+\end{enumerate}
+
+\subsection{Error Validasi}
+
+Jika muncul error validasi:
+\begin{enumerate}
+    \item Cek apakah semua field required terisi
+    \item Pastikan format data sesuai (tanggal, URL, dll)
+    \item Cek apakah foreign key valid (bidang lomba exists)
+\end{enumerate}
+
+\subsection{Error Route}
+
+Jika route tidak ditemukan:
+\begin{enumerate}
+    \item Jalankan \texttt{php artisan route:clear}
+    \item Jalankan \texttt{php artisan route:list} untuk cek route terdaftar
+    \item Pastikan urutan route di web.php benar
+\end{enumerate}
+
+\section{Kesimpulan}
+
+Implementasi fitur CRUD ini memberikan kemampuan penuh untuk mengelola data lomba dalam sistem. Dengan validasi yang ketat, keamanan yang terjaga, dan interface yang user-friendly, sistem ini siap digunakan untuk manajemen informasi lomba yang efektif.
+
+\subsection{Fitur Tambahan yang Bisa Dikembangkan}
+
+\begin{itemize}
+    \item Authentication dan authorization (hanya admin yang bisa CRUD)
+    \item Soft delete untuk recovery data yang terhapus
+    \item Audit trail untuk tracking perubahan data
+    \item Batch operations (delete multiple, update multiple)
+    \item Export data lomba ke Excel/PDF
+    \item Import data dari file CSV
+    \item Advanced filtering dan sorting
+    \item Search dengan fuzzy matching
+\end{itemize}
+
+\end{document}

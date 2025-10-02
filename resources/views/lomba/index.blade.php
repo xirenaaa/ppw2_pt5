@@ -66,6 +66,25 @@
             <p class="text-xl opacity-90">Temukan berbagai lomba menarik dan tingkatkan kemampuanmu!</p>
         </div>
 
+        <!-- Success Message -->
+        @if(session('success'))
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-md" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-xl"></i>
+                    <p class="font-medium">{{ session('success') }}</p>
+                </div>
+            </div>
+        @endif
+
+        <!-- Tombol Tambah Lomba -->
+        <div class="mb-6">
+            <a href="{{ route('lomba.create') }}" 
+               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all shadow-lg">
+                <i class="fas fa-plus-circle mr-2"></i>
+                Tambah Lomba Baru
+            </a>
+        </div>
+
         <!-- Search and Filters -->
         <div class="card-gradient p-6 rounded-2xl shadow-lg mb-8 border border-sky-100">
             <form action="{{ route('lomba.index') }}" method="GET">
@@ -281,10 +300,30 @@
                                     class="block w-full bg-gradient-to-r from-sky-500 to-sky-600 text-white text-center py-2 px-4 rounded-xl hover:from-sky-600 hover:to-sky-700 transition-all text-sm font-bold shadow-lg transform hover:scale-105">
                                     <i class="fas fa-eye mr-2"></i>Detail Lomba
                                 </a>
+                                
+                                <!-- Tombol Edit dan Delete -->
+                                <div class="grid grid-cols-2 gap-2">
+                                    <a href="{{ route('lomba.edit', $lomba->id_lomba) }}"
+                                        class="block w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-center py-2 px-3 rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all text-xs font-bold shadow-lg transform hover:scale-105">
+                                        <i class="fas fa-edit mr-1"></i>Edit
+                                    </a>
+                                    <form action="{{ route('lomba.destroy', $lomba->id_lomba) }}" method="POST" 
+                                          onsubmit="return confirm('Yakin ingin menghapus lomba ini?')" class="w-full">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="block w-full bg-gradient-to-r from-red-500 to-red-600 text-white text-center py-2 px-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all text-xs font-bold shadow-lg transform hover:scale-105">
+                                            <i class="fas fa-trash mr-1"></i>Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                @if($lomba->link_daftar)
                                 <a href="{{ $lomba->link_daftar }}" target="_blank"
                                     class="block w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-center py-2 px-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all text-sm font-bold shadow-lg transform hover:scale-105">
                                     <i class="fas fa-external-link-alt mr-2"></i>Daftar Sekarang
                                 </a>
+                                @endif
                             </div>
                         </div>
                     </div>
