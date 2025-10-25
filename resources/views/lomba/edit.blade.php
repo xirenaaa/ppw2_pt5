@@ -13,7 +13,7 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="mb-6">
-            <a href="{{ route('lomba.index') }}" 
+            <a href="{{ url('/') }}" 
                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Kembali ke Daftar Lomba
@@ -30,7 +30,7 @@
             </div>
 
             <!-- Form -->
-            <form action="{{ route('lomba.update', $lomba->id_lomba) }}" method="POST" enctype="multipart/form-data" class="p-8">
+            <form action="{{ url('/lomba/' . $lomba->id_lomba) }}" method="POST" enctype="multipart/form-data" class="p-8">
                 @csrf
                 @method('PUT')
 
@@ -257,7 +257,7 @@
                             class="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-3 px-6 rounded-xl hover:from-amber-600 hover:to-orange-700 transform hover:scale-105 transition-all shadow-lg">
                         <i class="fas fa-save mr-2"></i>Update Lomba
                     </button>
-                    <a href="{{ route('lomba.index') }}"
+                    <a href="{{ url('/') }}"
                        class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-bold py-3 px-6 rounded-xl hover:from-gray-600 hover:to-gray-700 transform hover:scale-105 transition-all shadow-lg text-center">
                         <i class="fas fa-times mr-2"></i>Batal
                     </a>

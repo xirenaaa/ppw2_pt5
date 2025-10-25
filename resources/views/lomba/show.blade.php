@@ -10,11 +10,64 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-trophy text-sky-600 text-3xl"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Sistem Info Lomba</h1>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    @auth
+                        <!-- Logged in user -->
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2 bg-gradient-to-r from-sky-50 to-blue-50 px-4 py-2 rounded-lg border border-sky-200">
+                                <div class="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Welcome back,</p>
+                                    <p class="font-semibold text-sm text-gray-800">{{ Auth::user()->name }}</p>
+                                </div>
+                                <span class="text-xs bg-sky-500 text-white px-2 py-0.5 rounded-full font-medium ml-2">
+                                    {{ ucfirst(Auth::user()->role) }}
+                                </span>
+                            </div>
+                            <a href="{{ url('/dashboard') }}" 
+                               class="px-3 py-1.5 text-sm bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-md hover:from-sky-600 hover:to-blue-600 transition-all font-medium shadow-sm hover:shadow-md">
+                                <i class="fas fa-th-large mr-1.5"></i>Dashboard
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                                @csrf
+                                <button type="submit" 
+                                        class="px-3 py-1.5 text-sm bg-white border border-red-300 text-red-600 rounded-md hover:bg-red-50 hover:border-red-400 transition-all font-medium">
+                                    <i class="fas fa-sign-out-alt mr-1.5"></i>Logout
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <!-- Not logged in -->
+                        <a href="{{ route('login') }}" 
+                           class="px-4 py-1.5 text-sm border border-sky-400 text-sky-600 rounded-md hover:bg-sky-50 transition-all font-medium">
+                            Login
+                        </a>
+                        <a href="{{ route('register') }}" 
+                           class="px-4 py-1.5 text-sm bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-md hover:from-sky-600 hover:to-blue-600 transition-all font-medium shadow-sm hover:shadow-md">
+                            Register
+                        </a>
+                    @endguest
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mx-auto px-4 py-8">
         <!-- Back Button -->
         <div class="mb-6">
-            <a href="{{ route('lomba.index') }}"
-                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-gray-700 transition">
+            <a href="{{ url('/') }}"
+                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Kembali ke Daftar Lomba
             </a>

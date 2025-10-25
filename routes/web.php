@@ -1,16 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LombaController;
+use Illuminate\Support\Facades\Route;
 
-// Public routes
-Route::get('/', [LombaController::class, 'index'])->name('home');
-Route::get('/lomba', [LombaController::class, 'index'])->name('lomba.index');
-Route::get('/lomba/{lomba}', [LombaController::class, 'show'])->name('lomba.show');
+// Public routes - accessible without login
+Route::get('/', [LombaController::class, 'index']);
+Route::get('/lomba/{id}', [LombaController::class, 'show']);
 
-// CRUD routes
-Route::get('/lomba/create/new', [LombaController::class, 'create'])->name('lomba.create');
-Route::post('/lomba', [LombaController::class, 'store'])->name('lomba.store');
-Route::get('/lomba/{lomba}/edit', [LombaController::class, 'edit'])->name('lomba.edit');
-Route::put('/lomba/{lomba}', [LombaController::class, 'update'])->name('lomba.update');
-Route::delete('/lomba/{lomba}', [LombaController::class, 'destroy'])->name('lomba.destroy');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Admin Only Routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/lomba/create/new', [LombaController::class, 'create']);
+        Route::post('/lomba', [LombaController::class, 'store']);
+        Route::get('/lomba/edit/{id}', [LombaController::class, 'edit']);
+        Route::put('/lomba/{id}', [LombaController::class, 'update']);
+        Route::delete('/lomba/{id}', [LombaController::class, 'destroy']);
+    });
+});
+
+require __DIR__.'/auth.php';
