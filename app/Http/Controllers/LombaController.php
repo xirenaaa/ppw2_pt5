@@ -6,6 +6,9 @@ use App\Models\Lomba;
 use App\Models\BidangLomba;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\LombaExport;
+use App\Imports\LombaImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LombaController extends Controller
 {
@@ -192,5 +195,51 @@ class LombaController extends Controller
         
         return redirect()->route('lomba.index')
             ->with('success', 'Lomba berhasil dihapus!');
+    }
+
+    /**
+     * Export data lomba ke Excel
+     */
+    public function export()
+    {
+        return Excel::download(new LombaExport, 'data-lomba-' . date('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Menampilkan form import
+     */
+    public function importForm()
+    {
+        return view('lomba.import');
+    }
+
+    /**
+     * Import data lomba dari Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120'
+        ], [
+            'file.required' => 'File harus dipilih',
+            'file.mimes' => 'File harus berformat Excel (xlsx, xls) atau CSV',
+            'file.max' => 'Ukuran file maksimal 5MB'
+        ]);
+
+        try {
+            Excel::import(new LombaImport, $request->file('file'));
+            
+            return redirect()->back()
+                ->with('success', 'Data lomba berhasil diimport!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan validasi pada baris: ' . implode(', ', array_map(fn($f) => $f->row(), $failures)))
+                ->with('failures', $failures);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }
