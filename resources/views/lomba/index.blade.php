@@ -131,11 +131,21 @@
         <!-- Tombol Tambah Lomba (Admin Only) -->
         @auth
             @if(Auth::user()->role == 'admin')
-            <div class="mb-6">
+            <div class="mb-6 flex flex-wrap gap-3">
                 <a href="{{ url('/lomba/create/new') }}" 
                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all shadow-lg">
                     <i class="fas fa-plus-circle mr-2"></i>
                     Tambah Lomba Baru
+                </a>
+                <a href="{{ route('lomba.export') }}" 
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transform hover:scale-105 transition-all shadow-lg">
+                    <i class="fas fa-file-excel mr-2"></i>
+                    Export Excel
+                </a>
+                <a href="{{ route('lomba.import.form') }}" 
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold rounded-xl hover:from-purple-600 hover:to-purple-700 transform hover:scale-105 transition-all shadow-lg">
+                    <i class="fas fa-file-import mr-2"></i>
+                    Import Excel
                 </a>
             </div>
             @endif

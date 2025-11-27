@@ -136,10 +136,60 @@
                         </div>
                     </div>
                 </a>
+
+                <!-- Export Excel Button (Admin Only) -->
+                <a href="{{ route('lomba.export') }}" class="group block bg-white rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                    <div class="p-5 sm:p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                <i class="fas fa-file-excel text-emerald-500 text-xl sm:text-2xl"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 group-hover:text-emerald-600 transition-colors">
+                                    Export Data Excel
+                                </h3>
+                                <p class="text-xs sm:text-sm text-gray-500 mb-3">
+                                    Download competition data
+                                </p>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Export semua data lomba ke dalam format Excel untuk analisis atau backup
+                                </p>
+                            </div>
+                            <div class="hidden sm:flex items-center justify-center">
+                                <i class="fas fa-arrow-right text-gray-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Import Excel Button (Admin Only) -->
+                <a href="{{ route('lomba.import.form') }}" class="group block bg-white rounded-xl border border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                    <div class="p-5 sm:p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                <i class="fas fa-file-import text-purple-500 text-xl sm:text-2xl"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 group-hover:text-purple-600 transition-colors">
+                                    Import Data Excel
+                                </h3>
+                                <p class="text-xs sm:text-sm text-gray-500 mb-3">
+                                    Upload bulk competition data
+                                </p>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Import data lomba secara massal melalui file Excel dengan template yang disediakan
+                                </p>
+                            </div>
+                            <div class="hidden sm:flex items-center justify-center">
+                                <i class="fas fa-arrow-right text-gray-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
                 @endif
 
                 <!-- View Competitions Button -->
-                <a href="{{ url('/') }}" class="group block bg-white rounded-xl border border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                <a href="{{ url('/') }}" class="group block bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
                     <div class="p-5 sm:p-6">
                         <div class="flex items-start gap-4">
                             <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">

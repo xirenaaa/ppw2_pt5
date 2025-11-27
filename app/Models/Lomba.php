@@ -15,6 +15,14 @@ class Lomba extends Model
     protected $keyType = 'int';
 
     /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'id_lomba';
+    }
+
+    /**
      * Mendefinisikan relasi ke model BidangLomba.
      */
     public function bidang()
